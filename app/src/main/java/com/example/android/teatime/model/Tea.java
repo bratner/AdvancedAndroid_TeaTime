@@ -40,5 +40,24 @@ public class Tea {
         return mImageResourceId;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Tea)
+            if (((Tea) obj).mTeaName.equals(mTeaName))
+                return true;
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return mTeaName.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return mTeaName;
+    }
+
 }
 

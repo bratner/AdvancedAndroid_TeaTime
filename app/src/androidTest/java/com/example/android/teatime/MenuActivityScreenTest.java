@@ -16,6 +16,35 @@
 
 package com.example.android.teatime;
 
+import android.support.test.espresso.DataInteraction;
+import android.support.test.espresso.action.ViewActions;
+import android.support.test.rule.ActivityTestRule;
+import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
+
+import com.example.android.teatime.model.Tea;
+
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static android.support.test.espresso.Espresso.onData;
+import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.assertion.ViewAssertions.matches;
+import static android.support.test.espresso.matcher.ViewMatchers.hasDescendant;
+import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static android.support.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.anything;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.hasToString;
+import static org.hamcrest.Matchers.hasValue;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+
 /**
  * This test demos a user clicking on a GridView item in MenuActivity which opens up the
  * corresponding OrderActivity.
@@ -27,14 +56,26 @@ package com.example.android.teatime;
 
 
 // TODO (1) Add annotation to specify AndroidJUnitRunner class as the default test runner
+@RunWith(AndroidJUnit4.class)
 public class MenuActivityScreenTest {
 
     // TODO (2) Add the rule that provides functional testing of a single activity
+    @Rule
+    public ActivityTestRule<MenuActivity> mActivityTestRule =
+            new ActivityTestRule<>(MenuActivity.class);
 
     // TODO (3) Finish writing this test which will click on a gridView Tea item and verify that
     // the OrderActivity opens up with the correct tea name displayed.
-
+    @Test
     public void clickGridViewItem_OpensOrderActivity() {
+        String teaName = "Green Tea";
+        //Tea green_tea = new Tea("Green Tea", R.drawable.green_tea);
+        // onData(is("Green Tea")).inAdapterView(withId(R.id.tea_grid_view)).perform(click());
+        // DataInteraction di = onData(anything()).inAdapterView(withId(R.id.tea_grid_view)).atPosition(1);
+        //DataInteraction di = onData(equalTo(green_tea));
+        DataInteraction di = onData(hasToString(teaName));
+        di.perform(click());
+        onView(withId(R.id.tea_name_text_view)).check(matches(withText(teaName)));
 
     }
 
