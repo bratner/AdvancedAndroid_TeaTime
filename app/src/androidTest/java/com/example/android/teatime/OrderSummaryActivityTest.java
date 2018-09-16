@@ -43,12 +43,12 @@ import static org.hamcrest.Matchers.not;
 @RunWith(AndroidJUnit4.class)
 public class OrderSummaryActivityTest {
 
-    // TODO (2) Add the rule that indicates we want to use Espresso-Intents APIs in functional UI tests
+    // DONE (2) Add the rule that indicates we want to use Espresso-Intents APIs in functional UI tests
     @Rule
     public IntentsTestRule<OrderSummaryActivity> marule = new IntentsTestRule<OrderSummaryActivity>(OrderSummaryActivity.class);
 
 
-    // TODO (3) Finish this method which runs before each test and will stub all external
+    // DONE (3) Finish this method which runs before each test and will stub all external
     // intents so all external intents will be blocked
     @Before
     public void stubAllExternalIntents() {
@@ -56,7 +56,7 @@ public class OrderSummaryActivityTest {
     }
 
 
-    // TODO (4) Finish this method which verifies that the intent sent by clicking the send email
+    // DONE (4) Finish this method which verifies that the intent sent by clicking the send email
     // button matches the intent sent by the application
 
     @Test
