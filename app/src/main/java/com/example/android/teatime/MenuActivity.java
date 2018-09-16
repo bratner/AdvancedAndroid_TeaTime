@@ -18,34 +18,52 @@ package com.example.android.teatime;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
+import android.support.test.espresso.IdlingResource;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.example.android.teatime.IdlingResource.SimpleIdlingResource;
 import com.example.android.teatime.model.Tea;
 
 import java.util.ArrayList;
 
-// TODO (1) Implement ImageDownloader.DelayerCallback
-public class MenuActivity extends AppCompatActivity {
+// DONE (1) Implement ImageDownloader.DelayerCallback
+public class MenuActivity extends AppCompatActivity implements ImageDownloader.DelayerCallback{
 
+    private static final String TAG = MenuActivity.class.getSimpleName();
     Intent mTeaIntent;
 
     public final static String EXTRA_TEA_NAME = "com.example.android.teatime.EXTRA_TEA_NAME";
 
-    // TODO (2) Add a SimpleIdlingResource variable that will be null in production
+    // DONE (2) Add a SimpleIdlingResource variable that will be null in production
+    @Nullable private SimpleIdlingResource mIdlingResource;
+
+    private ArrayList<Tea> mTeas = new ArrayList<>(10);
+    TeaMenuAdapter mAdapter;
 
     /**
-     * TODO (3) Create a method that returns the IdlingResource variable. It will
+     * DONE (3) Create a method that returns the IdlingResource variable. It will
      * instantiate a new instance of SimpleIdlingResource if the IdlingResource is null.
      * This method will only be called from test.
      */
+    @VisibleForTesting
+    @Nullable
+    public IdlingResource getIdlingResource() {
+        Log.d(TAG, "getIdlingResource");
+        if (mIdlingResource == null)
+            mIdlingResource = new SimpleIdlingResource();
+        return mIdlingResource;
+    }
 
 
     /**
-     * TODO (4) Using the method you created, get the IdlingResource variable.
+     * DONE (4) Using the method you created, get the IdlingResource variable.
      * Then call downloadImage from ImageDownloader. To ensure there's enough time for IdlingResource
      * to be initialized, remember to call downloadImage in either onStart or onResume.
      * This is because @Before in Espresso Tests is executed after the activity is created in
@@ -54,8 +72,19 @@ public class MenuActivity extends AppCompatActivity {
      */
 
 
-    // TODO (5) Override onDone so when the thread in ImageDownloader is finished, it returns an
+    // DONE (5) Override onDone so when the thread in ImageDownloader is finished, it returns an
     // ArrayList of Tea objects via the callback.
+    @Override
+    public void onDone(ArrayList<Tea> teas) {
+        Log.d(TAG, "Got a list of "+teas.size()+" from the 'internets'");
+        mTeas = teas;
+        //mAdapter.setData(mTeas);
+        GridView gridview = (GridView) findViewById(R.id.tea_grid_view);
+        Log.d(TAG, "Adapter currently holds "+gridview.getAdapter().getCount()+" items");
+        ((TeaMenuAdapter)gridview.getAdapter()).setData(teas);
+        Log.d(TAG, "Adapter now holds "+gridview.getAdapter().getCount()+" items");
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,19 +95,14 @@ public class MenuActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(getString(R.string.menu_title));
 
         // Create an ArrayList of teas
-        final ArrayList<Tea> teas = new ArrayList<>();
-        teas.add(new Tea(getString(R.string.black_tea_name), R.drawable.black_tea));
-        teas.add(new Tea(getString(R.string.green_tea_name), R.drawable.green_tea));
-        teas.add(new Tea(getString(R.string.white_tea_name), R.drawable.white_tea));
-        teas.add(new Tea(getString(R.string.oolong_tea_name), R.drawable.oolong_tea));
-        teas.add(new Tea(getString(R.string.honey_lemon_tea_name), R.drawable.honey_lemon_tea));
-        teas.add(new Tea(getString(R.string.chamomile_tea_name), R.drawable.chamomile_tea));
 
         // Create a {@link TeaAdapter}, whose data source is a list of {@link Tea}s.
         // The adapter know how to create grid items for each item in the list.
         GridView gridview = (GridView) findViewById(R.id.tea_grid_view);
-        TeaMenuAdapter adapter = new TeaMenuAdapter(this, R.layout.grid_item_layout, teas);
-        gridview.setAdapter(adapter);
+        mAdapter = new TeaMenuAdapter(this, R.layout.grid_item_layout, mTeas);
+        gridview.setAdapter(mAdapter);
+
+
 
 
         // Set a click listener on that View
@@ -94,5 +118,12 @@ public class MenuActivity extends AppCompatActivity {
                 startActivity(mTeaIntent);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getIdlingResource();
+        ImageDownloader.downloadImage(this, this, mIdlingResource);
     }
 }

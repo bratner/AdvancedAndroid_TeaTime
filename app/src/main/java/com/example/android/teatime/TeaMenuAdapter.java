@@ -40,6 +40,11 @@ public class TeaMenuAdapter extends ArrayAdapter<Tea> {
     private int layoutResourceId;
     private ArrayList data = new ArrayList();
 
+    public void setData(ArrayList data) {
+        clear();
+        addAll(data);
+    }
+
     public TeaMenuAdapter(Context context, int layoutResourceId, ArrayList data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
